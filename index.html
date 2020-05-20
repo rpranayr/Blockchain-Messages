@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Deploy a Remix Contract</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css" />
+
+    <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+  </head>
+
+  <body>
+    <div>
+      <h1>Ethereum Secret Messenger</h1>
+      <hr />
+
+      <label for="message"
+        >This site writes a secret message to the Ethereum blockchain!</label
+      >
+      <input id="userInput" type="text" />
+
+      <button id="setMessageButton">Set secret message</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+
+    <script>
+      function getAccounts(callback) {
+        web3.eth.getAccounts((error, result) => {
+          if (error) {
+            console.log(error);
+          } else {
+            callback(result);
+          }
+        });
+      }
+
+      window.addEventListener("load", async () => {
+        if (window.ethereum) {
+          window.web3 = new Web3(ethereum);
+          try {
+            await ethereum.enable();
+            console.log("Connected to metamask");
+          } catch (error) {
+            console.log("Denied Access");
+          }
+        } else if (window.web3) {
+          window.web3 = new Web3(web3.currentProvider);
+        } else {
+          web3 = new Web3(
+            new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545")
+          );
+          console.log("Connected to ganache-gui");
+        }
+        getAccounts(function (result) {
+          web3.eth.Contract.defaultAccount = result[0];
+
+          var RemixContract = new web3.eth.Contract(
+            [
+              {
+                inputs: [
+                  {
+                    internalType: "string",
+                    name: "x",
+                    type: "string",
+                  },
+                ],
+                name: "setMessage",
+                outputs: [],
+                stateMutability: "nonpayable",
+                type: "function",
+              },
+              {
+                inputs: [],
+                name: "getMessage",
+                outputs: [
+                  {
+                    internalType: "string",
+                    name: "",
+                    type: "string",
+                  },
+                ],
+                stateMutability: "view",
+                type: "function",
+              },
+            ],
+            "0x21267BB05b3b7fBC90A11FECa5F019a81C66F057"
+          ); //1st param is abi, 2nd is contract address
+
+          $("#setMessageButton").click(function () {
+            RemixContract.methods
+              .setMessage($("#userInput").val())
+              .send(
+                { from: web3.eth.Contract.defaultAccount },
+                (error, result) => {
+                  message = result;
+                }
+              );
+            console.log($("#userInput").val());
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

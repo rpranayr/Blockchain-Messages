@@ -1,0 +1,15 @@
+
+
+*.env 
+.env* 
+*.local
+
+/Extra
+/nd1309-work-code-master
+/node_modules
+/hashing.js
+/img2hex.js
+/simpleChain.js
+/test.js
+/testnet_block_1325438.json
+/index2.html
